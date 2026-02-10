@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+{% block title %}Students | Attendance{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h2 class="fw-semibold mb-1">
+      Students Management / إدارة الطلاب
+    </h2>
+    <p class="text-muted mb-0">
+      Add, edit, and delete students for each class.<br>
+      <span class="d-block">إضافة وتعديل وحذف الطلاب لكل فصل.</span>
+    </p>
+  </div>
+  <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addStudentModal">
+    <i class="bi bi-person-plus me-1"></i>
+    Add Student / إضافة طالب
+  </button>
+</div>
+
+<div class="card shadow-sm border-0">
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>#</th>
+            <th>Student Name / اسم الطالب</th>
+            <th>Parent Phone / رقم ولي الأمر</th>
+            <th>Class / الفصل</th>
+            <th>Actions / إجراءات</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in students %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ s.name }}</td>
+            <td>{{ s.parent_phone }}</td>
+            <td>{{ s.class_name }}</td>
+            <td>
+              <button class="btn btn-sm btn-outline-secondary"
+                      data-bs-toggle="modal"
+                      data-bs-target="#editStudentModal"
+                      data-id="{{ s.id }}"
+                      data-name="{{ s.name }}"
+                      data-parent_phone="{{ s.parent_phone }}"
+                      data-class_name="{{ s.class_name }}">
+                <i class="bi bi-pencil-square"></i>
+              </button>
+              <form method="POST"
+                    action="{{ url_for('delete_student', student_id=s.id) }}"
+                    style="display:inline-block;"
+                    onsubmit="return confirm('Delete this student? / حذف هذا الطالب؟');">
+                <button type="submit" class="btn btn-sm btn-outline-danger">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Add Student Modal -->
+<div class="modal fade" id="addStudentModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="POST" action="{{ url_for('add_student') }}">
+        <div class="modal-header">
+          <h5 class="modal-title">Add Student / إضافة طالب</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">
+              Student Name / اسم الطالب
+            </label>
+            <input type="text" name="name" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">
+              Parent Phone / رقم ولي الأمر
+            </label>
+            <input type="text" name="parent_phone" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">
+              Class / الفصل
+            </label>
+            <input type="text" name="class_name" class="form-control" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            Close / إلغاء
+          </button>
+          <button type="submit" class="btn btn-primary">
+            Save / حفظ
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Student Modal -->
+<div class="modal fade" id="editStudentModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="POST" id="editStudentForm">
+        <div class="modal-header">
+          <h5 class="modal-title">Edit Student / تعديل طالب</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="editStudentId">
+          <div class="mb-3">
+            <label class="form-label">
+              Student Name / اسم الطالب
+            </label>
+            <input type="text" name="name" id="editName" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">
+              Parent Phone / رقم ولي الأمر
+            </label>
+            <input type="text" name="parent_phone" id="editParentPhone" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">
+              Class / الفصل
+            </label>
+            <input type="text" name="class_name" id="editClassName" class="form-control" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            Close / إلغاء
+          </button>
+          <button type="submit" class="btn btn-primary">
+            Update / تحديث
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+const editModal = document.getElementById('editStudentModal');
+if (editModal) {
+  editModal.addEventListener('show.bs.modal', event => {
+    const button = event.relatedTarget;
+    const id = button.getAttribute('data-id');
+    const name = button.getAttribute('data-name');
+    const parentPhone = button.getAttribute('data-parent_phone');
+    const className = button.getAttribute('data-class_name');
+
+    document.getElementById('editName').value = name;
+    document.getElementById('editParentPhone').value = parentPhone;
+    document.getElementById('editClassName').value = className;
+
+    const form = document.getElementById('editStudentForm');
+    form.action = "{{ url_for('update_student', student_id=0) }}".replace('0', id);
+  });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Dashboard | Attendance{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+  <div class="col">
+    <h2 class="fw-semibold mb-1">
+      Dashboard / لوحة التحكم
+    </h2>
+    <p class="text-muted mb-0">
+      Manage classes and record students’ attendance in real time.<br>
+      <span class="d-block">إدارة الفصول وتسجيل حضور الطلاب في الوقت الفعلي.</span>
+    </p>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="card shadow-sm border-0">
+      <div class="card-body">
+        <h6 class="text-muted mb-2">Today / اليوم</h6>
+        <h3 class="fw-bold mb-0">{{ current_date }}</h3>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card shadow-sm border-0">
+      <div class="card-body">
+        <h6 class="text-muted mb-2">Total Classes / عدد الفصول</h6>
+        <h3 class="fw-bold mb-0">{{ classes|length }}</h3>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card shadow-sm border-0 mb-4">
+  <div class="card-header bg-white">
+    <h5 class="mb-0">
+      <i class="bi bi-clipboard-check me-1"></i>
+      Take Attendance / تسجيل الحضور
+    </h5>
+  </div>
+  <div class="card-body">
+    <form method="GET" action="{{ url_for('attendance') }}" class="row g-3 align-items-end">
+      <div class="col-md-6">
+        <label class="form-label">
+          Select Class / Group<br>
+          <span class="text-muted" style="font-size:0.9rem;">اختر الفصل / المجموعة</span>
+        </label>
+        <select name="class" class="form-select" required>
+          <option value="" disabled selected>Choose a class... / اختر فصلًا...</option>
+          {% for cls in classes %}
+            <option value="{{ cls }}">{{ cls }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-3">
+        <button type="submit" class="btn btn-primary w-100">
+          <i class="bi bi-journal-check me-1"></i>
+          Open Attendance / فتح الحضور
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
